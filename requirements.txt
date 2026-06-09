@@ -1,0 +1,7 @@
+gradio>=5.0.0
+vllm>=0.10.0
+torch
+pandas
+numpy
+matplotlib
+requests
