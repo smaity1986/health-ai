@@ -15,43 +15,29 @@ from vllm import SamplingParams
 
 import torch
 
-print(torch.cuda.is_available())
-
-print(torch.cuda.get_device_name(0))
-
-import torch
-
-free_mem, total_mem = torch.cuda.mem_get_info()
-
-print(free_mem)
-print(total_mem)
-
 llm = None
 sampling_params = None
 
+
 def get_llm():
-    global llm, sampling_params
+
+    global llm
+    global sampling_params
+
     if llm is None:
-        print("Loading Healthcare AI Model...")
-        llm = LLM(model="Qwen/Qwen2.5-0.5B-Instruct", gpu_memory_utilization=0.05)
-        sampling_params = SamplingParams(temperature=0.0, max_tokens=300)
+
+        llm = LLM(
+            model="Qwen/Qwen2.5-0.5B-Instruct",
+            gpu_memory_utilization=0.05
+        )
+
+        sampling_params = SamplingParams(
+            temperature=0.0,
+            max_tokens=300
+        )
+
     return llm, sampling_params
 
-
-prompt = "What is healthy blood pressure?"
-
-llm, sampling_params = get_llm()
-
-outputs = llm.generate(
-    [prompt],
-    sampling_params
-)
-
-print(
-    outputs[0].outputs[0].text
-)
-
-import os
 
 os.makedirs(
     "reports",
@@ -441,45 +427,6 @@ def generate_vllm_report(
 
     return response
 
-report = generate_vllm_report(
-    patient
-)
-
-print(report)
-
-def save_report(
-    patient,
-    report
-):
-
-    output = {
-
-        "patient": patient,
-
-        "report": report
-    }
-
-    with open(
-        "healthcare_report.json",
-        "w"
-    ) as f:
-
-        json.dump(
-            output,
-            f,
-            indent=4
-        )
-
-    return "healthcare_report.json"
-
-save_report(
-    patient,
-    report
-)
-
-print(
-    "Report Saved"
-)
 
 def healthcare_dashboard(
 
@@ -583,235 +530,6 @@ def healthcare_dashboard(
         risk_score,
         urgency,
         "healthcare_report.json"
-    )
-
-import gradio as gr
-
-with gr.Blocks(
-    title="AI Healthcare Intelligence Platform"
-) as app:
-
-    gr.Markdown(
-        """
-# 🏥 AI Healthcare Intelligence Platform
-
-AMD ROCm + vLLM Powered Healthcare Risk Assessment
-
-⚠ Educational Use Only
-"""
-    )
-
-    # -------------------------
-    # Patient Demographics
-    # -------------------------
-
-    gr.Markdown("## Patient Information")
-
-    with gr.Row():
-
-        age = gr.Number(
-            label="Age",
-            value=40
-        )
-
-        gender = gr.Dropdown(
-            choices=[
-                "Male",
-                "Female",
-                "Other"
-            ],
-            label="Gender",
-            value="Male"
-        )
-
-    # -------------------------
-    # Physical Metrics
-    # -------------------------
-
-    gr.Markdown("## Physical Metrics")
-
-    with gr.Row():
-
-        weight = gr.Number(
-            label="Weight (kg)",
-            value=70
-        )
-
-        height = gr.Number(
-            label="Height (cm)",
-            value=170
-        )
-
-    # -------------------------
-    # Symptoms
-    # -------------------------
-
-    gr.Markdown("## Symptoms")
-
-    symptoms = gr.Dropdown(
-
-        choices=[
-
-            "Chest Pain",
-            "Shortness of Breath",
-            "Fever",
-            "Cough",
-            "Headache",
-            "Dizziness",
-            "Fatigue",
-            "Nausea",
-            "Vomiting",
-            "Diarrhea",
-            "Abdominal Pain",
-            "Back Pain",
-            "Sore Throat",
-            "Runny Nose",
-            "Loss of Appetite",
-            "Loss of Consciousness",
-            "Palpitations",
-            "High Blood Pressure",
-            "Low Blood Pressure",
-            "Severe Bleeding",
-            "Blurred Vision",
-            "Joint Pain",
-            "Muscle Pain",
-            "Skin Rash",
-            "Anxiety",
-            "Depression",
-            "Insomnia"
-
-        ],
-
-        multiselect=True,
-
-        filterable=True,
-
-        allow_custom_value=True,
-
-        label="Symptoms"
-    )
-
-    severity = gr.Slider(
-        minimum=1,
-        maximum=10,
-        value=5,
-        step=1,
-        label="Symptom Severity"
-    )
-
-    # -------------------------
-    # Medical History
-    # -------------------------
-
-    gr.Markdown("## Medical Information")
-
-    medical_history = gr.Textbox(
-        lines=2,
-        label="Medical History (comma separated)"
-    )
-
-    medications = gr.Textbox(
-        lines=2,
-        label="Current Medications (comma separated)"
-    )
-
-    # -------------------------
-    # Vital Signs
-    # -------------------------
-
-    gr.Markdown("## Vital Signs")
-
-    with gr.Row():
-
-        heart_rate = gr.Number(
-            label="Heart Rate"
-        )
-
-        temperature = gr.Number(
-            label="Temperature (°F)"
-        )
-
-        spo2 = gr.Number(
-            label="SpO₂ (%)"
-        )
-
-    # -------------------------
-    # Analyze Button
-    # -------------------------
-
-    analyze_btn = gr.Button(
-        "Analyze Patient",
-        variant="primary"
-    )
-
-    # -------------------------
-    # Dashboard Metrics
-    # -------------------------
-
-    gr.Markdown("## Assessment Results")
-
-    with gr.Row():
-
-        bmi_output = gr.Number(
-            label="BMI"
-        )
-
-        risk_output = gr.Number(
-            label="Risk Score"
-        )
-
-        urgency_output = gr.Textbox(
-            label="Urgency Level"
-        )
-
-    # -------------------------
-    # AI Report
-    # -------------------------
-
-    report_output = gr.Textbox(
-        label="Healthcare Intelligence Report",
-        lines=18
-    )
-
-    # -------------------------
-    # JSON Export
-    # -------------------------
-
-    download_json = gr.File(
-        label="Download JSON Report"
-    )
-
-    # -------------------------
-    # Connect Backend
-    # -------------------------
-
-    analyze_btn.click(
-
-        fn=healthcare_dashboard,
-
-        inputs=[
-
-            age,
-            gender,
-            weight,
-            height,
-            symptoms,
-            severity,
-            medical_history,
-            medications,
-            heart_rate,
-            temperature,
-            spo2
-        ],
-
-        outputs=[
-
-            report_output,
-            bmi_output,
-            risk_output,
-            urgency_output,
-            download_json
-        ]
     )
 
 import gradio as gr
