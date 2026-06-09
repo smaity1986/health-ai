@@ -19,8 +19,6 @@ print(torch.cuda.is_available())
 
 print(torch.cuda.get_device_name(0))
 
-!rocm-smi
-
 import torch
 
 free_mem, total_mem = torch.cuda.mem_get_info()
