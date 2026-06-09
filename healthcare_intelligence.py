@@ -3,12 +3,6 @@
 # Next step (optional): refactor into modules & generate tests with RunCell
 # Quick start: pip install runcell
 
-!pip install -q vllm
-!pip install -q gradio
-!pip install -q pandas
-!pip install -q numpy
-!pip install -q matplotlib
-
 import json
 import pandas as pd
 import numpy as np
