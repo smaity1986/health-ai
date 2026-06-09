@@ -1,3 +1,8 @@
+# Generated from: health.ipynb
+# Converted at: 2026-06-09T12:25:49.965Z
+# Next step (optional): refactor into modules & generate tests with RunCell
+# Quick start: pip install runcell
+
 import json
 import pandas as pd
 import numpy as np
@@ -21,19 +26,23 @@ free_mem, total_mem = torch.cuda.mem_get_info()
 print(free_mem)
 print(total_mem)
 
-llm = LLM(
-    model="Qwen/Qwen2.5-0.5B-Instruct",
-    gpu_memory_utilization=0.05
-)
+llm = None
+sampling_params = None
 
-sampling_params = SamplingParams(
-    temperature=0.0,
-    max_tokens=300
-)
+def get_llm():
+    global llm, sampling_params
+    if llm is None:
+        print("Loading Healthcare AI Model...")
+        llm = LLM(model="Qwen/Qwen2.5-0.5B-Instruct", gpu_memory_utilization=0.05)
+        sampling_params = SamplingParams(temperature=0.0, max_tokens=300)
+    return llm, sampling_params
+
 
 prompt = "What is healthy blood pressure?"
 
-outputs = llm.generate(
+llm, sampling_params = get_llm()
+
+    outputs = llm.generate(
     [prompt],
     sampling_params
 )
@@ -420,6 +429,8 @@ def generate_vllm_report(
         risk_score,
         urgency
     )
+
+    llm, sampling_params = get_llm()
 
     outputs = llm.generate(
         [prompt],
@@ -1007,6 +1018,5 @@ AMD ROCm + vLLM Powered Healthcare Risk Assessment
         ]
     )
 
-app.launch(
-    share=True
-)
+if __name__ == "__main__":
+    app.launch(share=True)
