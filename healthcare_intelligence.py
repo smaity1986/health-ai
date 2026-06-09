@@ -1,8 +1,3 @@
-# Generated from: health.ipynb
-# Converted at: 2026-06-09T12:25:49.965Z
-# Next step (optional): refactor into modules & generate tests with RunCell
-# Quick start: pip install runcell
-
 import json
 import pandas as pd
 import numpy as np
