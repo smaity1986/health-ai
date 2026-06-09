@@ -42,7 +42,7 @@ prompt = "What is healthy blood pressure?"
 
 llm, sampling_params = get_llm()
 
-    outputs = llm.generate(
+outputs = llm.generate(
     [prompt],
     sampling_params
 )
